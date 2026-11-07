@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Meet the Weekly Report Assistant, an AI agent that turns scattered work updates into a clear weekly report.">
+  <title>Weekly Report Assistant — AI Agent</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18243a;
+      --muted: #68758b;
+      --line: #e5eaf2;
+      --blue: #5268d9;
+      --blue-soft: #eef0ff;
+      --green: #16866d;
+      --surface: #fff;
+      --page: #f5f7fb;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--page); color: var(--ink); line-height: 1.65; }
+    a { color: inherit; }
+    .page { width: min(100% - 36px, 980px); margin: 0 auto; padding: 28px 0 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; letter-spacing: -.02em; }
+    .brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; color: white; background: var(--blue); box-shadow: 0 5px 14px #5268d933; }
+    .top-link { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .top-link:hover { color: var(--blue); }
+    .hero { position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px); border: 1px solid #e8eafd; border-radius: 24px; background: linear-gradient(120deg, #fff 45%, #f0f1ff); box-shadow: 0 14px 40px #26345b0a; }
+    .hero:after { position: absolute; content: ""; width: 260px; height: 260px; right: -90px; top: -130px; border-radius: 50%; background: #dfe3ff80; }
+    .eyebrow { color: var(--blue); text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 800; }
+    h1 { max-width: 690px; margin: 10px 0 12px; font-size: clamp(34px, 6vw, 54px); letter-spacing: -.055em; line-height: 1.08; }
+    .hero-copy { max-width: 640px; margin: 0; color: var(--muted); font-size: 17px; }
+    .definition { position: relative; z-index: 1; display: flex; gap: 12px; align-items: flex-start; margin-top: 28px; padding: 16px 18px; border: 1px solid #e6e9f7; border-radius: 14px; background: #ffffffc9; font-size: 14px; }
+    .definition strong { white-space: nowrap; }
+    .section { margin-top: 34px; padding: clamp(22px, 4vw, 32px); border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 8px 24px #26345b06; }
+    .section h2 { margin: 0 0 17px; font-size: 21px; letter-spacing: -.025em; line-height: 1.3; }
+    .section p { margin: 0 0 12px; color: var(--muted); }
+    .section p:last-child { margin-bottom: 0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .mini-card { padding: 17px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .mini-card strong { display: block; margin-bottom: 5px; }
+    .mini-card span { color: var(--muted); font-size: 14px; }
+    .tool-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+    .tool { padding: 16px; border-radius: 14px; background: #f7f8fc; }
+    .tool b { display: block; margin-bottom: 5px; font-size: 14px; }
+    .tool span { display: block; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .saving { color: var(--green); font-weight: 700; }
+    .steps { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; counter-reset: step; }
+    .steps li { display: flex; align-items: flex-start; gap: 13px; padding: 12px 14px; border-radius: 12px; background: #f8f9fc; color: #435067; font-size: 14px; counter-increment: step; }
+    .steps li:before { content: counter(step); display: grid; flex: 0 0 25px; height: 25px; place-items: center; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-weight: 800; font-size: 12px; }
+    .outputs { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .output { padding: 15px 16px; border: 1px solid var(--line); border-radius: 13px; }
+    .output b { display: block; margin-bottom: 3px; }
+    .output span { color: var(--muted); font-size: 13px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .split article { padding: 18px; border-radius: 15px; background: #f7faf9; }
+    .split article:last-child { background: #fbf8f5; }
+    .split h3 { margin: 0 0 10px; font-size: 15px; }
+    .split ul, .notes { padding-left: 19px; margin: 0; color: var(--muted); font-size: 14px; }
+    .split li + li, .notes li + li { margin-top: 7px; }
+    .trigger { display: inline-block; margin: 12px 0; padding: 10px 15px; border: 1px solid #e1e5f4; border-radius: 10px; background: #f7f8ff; color: var(--blue); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
+    footer { padding: 24px 10px 0; color: #8792a5; text-align: center; font-size: 12px; }
+    @media (max-width: 700px) { .tool-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 520px) {
+      .page { width: min(100% - 24px, 980px); padding-top: 18px; }
+      .topbar { margin-bottom: 18px; }
+      .top-link { font-size: 12px; }
+      .definition { display: block; }
+      .definition strong { display: block; margin-bottom: 5px; }
+      .grid, .outputs, .split { grid-template-columns: 1fr; }
+      .section { margin-top: 18px; }
+      th, td { padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Main navigation">
+      <a class="brand" href="#top" style="text-decoration:none"><span class="brand-mark" aria-hidden="true">✦</span> Agent Studio</a>
+      <a class="top-link" href="#workflow">How it works <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="eyebrow">A practical AI assistant</div>
+      <h1>Weekly Report Assistant</h1>
+      <p class="hero-copy">A simple way to turn scattered work updates into a clear, structured weekly report.</p>
+      <div class="definition"><strong>In one sentence</strong><span>Every Friday, the assistant gathers team updates, project data, meeting notes, and daily work snippets—then drafts a report for your review.</span></div>
+    </header>
+
+    <section class="section">
+      <h2>What it does</h2>
+      <p>The Weekly Report Assistant is an AI agent that works like an administrative partner. It collects the week’s updates, groups them by project, and prepares a consistent report in a shared document.</p>
+      <p>You stay in control of the decisions. The assistant takes care of the repetitive work of searching through chats, checking project updates, and formatting the report.</p>
+    </section>
+
+    <section class="section">
+      <h2>Less time spent on busywork</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Task</th><th>Before</th><th>With the assistant</th></tr></thead>
+        <tbody>
+          <tr><td>Review team chats</td><td>15 min</td><td class="saving">Automatic summary</td></tr>
+          <tr><td>Check project trackers</td><td>10 min</td><td class="saving">Automatic review</td></tr>
+          <tr><td>Review meeting notes</td><td>15 min</td><td class="saving">Key points collected</td></tr>
+          <tr><td>Write and format the report</td><td>15 min</td><td class="saving">Draft prepared</td></tr>
+          <tr><td><strong>Total</strong></td><td>About 60 min / week</td><td class="saving">About 5 min to review</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="section">
+      <h2>Tools in the setup</h2>
+      <div class="tool-grid">
+        <div class="tool"><b>ZCode</b><span>Builds and debugs the agent</span></div>
+        <div class="tool"><b>Hermes Agent</b><span>Runs the profile, schedule, and tasks</span></div>
+        <div class="tool"><b>Lark CLI + Bot</b><span>Reads and writes documents and tables</span></div>
+        <div class="tool"><b>DeepSeek</b><span>Understands updates and drafts content</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What goes in</h2>
+      <div class="grid">
+        <div class="mini-card"><strong>Team chat messages</strong><span>Daily updates from project channels</span></div>
+        <div class="mini-card"><strong>Project tracker</strong><span>Structured task and status updates</span></div>
+        <div class="mini-card"><strong>Meeting notes</strong><span>Transcripts, decisions, and follow-ups</span></div>
+        <div class="mini-card"><strong>Messages to the bot</strong><span>Work notes shared during the week</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li>Find chat updates that mention completed or delivered work.</li>
+        <li>Read project tracker rows updated during the week.</li>
+        <li>Collect meeting decisions, action items, and owners.</li>
+        <li>Group updates by project and separate results from plans.</li>
+        <li>Check details against the project tracker as the source of truth.</li>
+        <li>Draft the report, create a shared document, and provide its link.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>What comes out</h2>
+      <p>The assistant creates a shared document with four familiar sections:</p>
+      <div class="outputs">
+        <div class="output"><b>📊 This week’s results</b><span>Completed work, grouped by project</span></div>
+        <div class="output"><b>📅 Next week’s plan</b><span>Work that is underway or coming next</span></div>
+        <div class="output"><b>⚠️ Challenges</b><span>Blockers and possible next steps</span></div>
+        <div class="output"><b>📎 Links and sources</b><span>Meeting notes, trackers, and references</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What it can and cannot do</h2>
+      <div class="split">
+        <article><h3>✓ It can</h3><ul><li>Collect work updates from connected chats</li><li>Read project tracker data</li><li>Summarize meetings and follow-ups</li><li>Organize updates and draft a report</li></ul></article>
+        <article><h3>× It cannot</h3><ul><li>Make up progress that was never reported</li><li>Change the original project tracker</li><li>Replace a manager’s judgment</li><li>Share an unreviewed draft with others</li></ul></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How to start</h2>
+      <p>Send a message to the Weekly Report Assistant in Lark:</p>
+      <div class="trigger">Generate my weekly report</div>
+      <p>Or schedule it to run every Friday at 5:00 PM.</p>
+    </section>
+
+    <section class="section">
+      <h2>A few things to keep in mind</h2>
+      <ul class="notes">
+        <li>Review the draft before using or sharing it.</li>
+        <li>Set up project tracking fields before connecting the assistant.</li>
+        <li>Messages from WeChat are not connected in this version.</li>
+        <li>The assistant is not designed to make sensitive personnel decisions.</li>
+      </ul>
+    </section>
+
+    <footer>Built with Hermes Agent, Lark Bot, and DeepSeek · AI Agent Project</footer>
+  </main>
+</body>
+</html>
